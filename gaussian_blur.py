@@ -17,9 +17,16 @@ def process(filename, r):
     coeff = gauss_dist / np.sum(gauss_dist)
 
     # код сюда ....
-    newimg = img
+    w, h = img.size
+    a = np.array(img.getdata(), dtype=np.uint8).reshape(h, w)
+    b = np.zeros((h,w), dtype=np.float)
+    for i in range(h):
+        for j in range(w):
+            b[i,j] = (1 / (2*pi*(sigma)**2) * gauss_dist)
+
+    newimg = Image.fromarray(b)
     newimg.show()
-    newimg.save(filename+'.gaussblurred.png')
+    newimg.save(filename+'gaussblurred-goorain.png')
 
 
 
