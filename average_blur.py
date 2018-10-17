@@ -2,48 +2,18 @@ from PIL import Image
 from math import pi, log, exp
 import numpy as np
 
-def blur_py(img, r):
+def average_blur(img, r):
     w, h = img.size
     a = np.array(img.getdata(), dtype=np.uint8).reshape(h, w)
     b = np.zeros((h,w), dtype=np.uint8)
-    for i in range(h):
-        for j in range(w):
+    for i in range(r, h - r):
+        for j in range(r, w - r):
             s = 0.
-            up, bt = max(i-r,0), min(i+r+1,h)
-            lf, rt = max(j-r,0), min(j+r+1,w)
-            n = (bt-up)*(rt-lf)
-            for y in range(up,bt):
-                for x in range(lf,rt):
-                    s += a[y,x]
-            b[i,j] = s / n
+            for x in range(-r, r):
+                for y in range(-r, r):
+                    s+=a[i+x,j+y]
+            b[i,j] = s / (2*r+1)**2
     return Image.fromarray(b)
-
-
-def blur_np(img, r):
-    w, h = img.size
-    a = np.array(img.getdata(), dtype=np.uint8)\
-                .reshape(h, w)
-    b = np.zeros((h,w), dtype=np.uint8)
-    for i in range(h):
-        for j in range(w):
-            up, bt = max(i-r,0), min(i+r+1,h)
-            lf, rt = max(j-r,0), min(j+r+1,w)
-            b[i,j] = np.average(a[up:bt, lf:rt])
-    return Image.fromarray(b)
-
-
-def blur_np(img, r):
-    w, h = img.size
-    a = np.array(img.getdata(), dtype=np.uint8)\
-                .reshape(h, w)
-    b = np.zeros((h,w), dtype=np.uint8)
-    for i in range(h):
-        for j in range(w):
-            up, bt = max(i-r,0), min(i+r+1,h)
-            lf, rt = max(j-r,0), min(j+r+1,w)
-            b[i,j] = np.average(a[up:bt, lf:rt])
-    return Image.fromarray(b)
-
 
 img = Image.open('darwin.png')
 img.load()
