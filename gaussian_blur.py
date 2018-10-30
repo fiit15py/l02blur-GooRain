@@ -39,24 +39,37 @@ def process(filename, r):
 
     # код сюда ....
     w, h = img.size
-    a = np.array(img.getdata(), dtype = np.uint8).reshape(h, w)
-    b = np.zeros((h, w), dtype = np.float)
-    startH = 1000
-    startW = 1000
-    endH = h + r - 1 - 1500
-    endW = w + r - 1 - 1400
-    total = endH * endW
+    a = np.array(img.getdata(), dtype = np.uint8).reshape(w, h)
+    b = np.zeros((w, h), dtype = np.uint8)
+    startH = r
+    startW = r
+    endH = h - r
+    endW = w - r
+    total = h * w
     iteration = 0
-    for i in range(startH + r + 1, endH):
-        for j in range(startW + r + 1, endW):
+    # [ ? ? ? ? ? ? ?]  x = -r, -r + 1, -r + 2, 0, r - 2, r - 1, r = range(-r, r + 1)
+    # [ ? ? ? ? ? ? ?]
+    # [ ? ? ? ? ? ? ?]
+    # [ ? ? ? ? ? ? ?]
+    # [ ? ? ? X ? ? ?]  X[i, j] = ?[i - x, j - y] * coeff
+    # [ ? ? ? ? ? ? ?]
+    # [ ? ? ? ? ? ? ?]
+    # [ ? ? ? ? ? ? ?]
+    # [ ? ? ? ? ? ? ?]  
+    
+    for i in range(startW, endW):
+        for j in range(startH, endH):
+            iteration += 1
             for x in range(-r, r + 1):
                 for y in range(-r, r + 1):
-                        iteration += 1
-                        b[i,j] += coeff[x // 2 + r // 2,y // 2 + r // 2] * a[i + x, j + y]
-                        printProgressBar(iteration, total, length = 75)
+                        b[i,j] += a[i + x, j + y] * coeff[r + x, r + y]
+                        # print(b[i,j])
+                        # printProgressBar(iteration, total, length = 75)
+        printProgressBar(iteration, total, length = 75)
 
     newimg = Image.fromarray(b)
-    newimg.save(filename + 'gaussblurred-goorain.png')
+    newimg.save(filename[:-4] + 'gaussblurred-goorain.png')
+    print("Success!")
 
 if __name__=='__main__':
     # Запускать с командной строки с аргументом <имя файла>, например: python gauss.py darwin.png
