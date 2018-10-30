@@ -39,12 +39,13 @@ def process(filename, r):
 
     # код сюда ....
     w, h = img.size
-    a = np.array(img.getdata(), dtype = np.uint8).reshape(w, h)
-    b = np.zeros((w, h), dtype = np.uint8)
-    startH = r
-    startW = r
-    endH = h - r
-    endW = w - r
+    a = np.array(img.getdata(), dtype = np.uint8).reshape(h, w)
+    b = np.zeros((h, w), dtype = np.uint8)
+    # startH = r
+    # startW = r
+    # endH = h - r - 1
+    # endW = w - r - 1
+    # total = (endH - startH) * (endW - startW)
     total = h * w
     iteration = 0
     # [ ? ? ? ? ? ? ?]  x = -r, -r + 1, -r + 2, 0, r - 2, r - 1, r = range(-r, r + 1)
@@ -57,18 +58,24 @@ def process(filename, r):
     # [ ? ? ? ? ? ? ?]
     # [ ? ? ? ? ? ? ?]  
     
-    for i in range(startW, endW):
-        for j in range(startH, endH):
+    for i in range(0, h):
+        for j in range(0, w):
             iteration += 1
             for x in range(-r, r + 1):
                 for y in range(-r, r + 1):
-                        b[i,j] += a[i + x, j + y] * coeff[r + x, r + y]
+                        # ix = max(0, min(r, i + x))
+                        # jy = max(0, min(r, j + y))
+                        ix = i + x
+                        jy = j + y
+                        if(ix > 0 and ix < h):
+                            if(jy > 0 and jy < w):
+                                b[i,j] += round(a[ix, jy] * coeff[r + x, r + y])
                         # print(b[i,j])
-                        # printProgressBar(iteration, total, length = 75)
-        printProgressBar(iteration, total, length = 75)
+                        # printProgressBar(iteration, total, length = 50)
+        printProgressBar(iteration, total, length = 50)
 
     newimg = Image.fromarray(b)
-    newimg.save(filename[:-4] + 'gaussblurred-goorain.png')
+    newimg.save(filename[:-4] + '-gaussblurred-goorain.png')
     print("Success!")
 
 if __name__=='__main__':
